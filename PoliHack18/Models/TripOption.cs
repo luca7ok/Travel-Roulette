@@ -7,6 +7,5 @@ public class TripOption
     public string FlightInfo { get; set; } = string.Empty;
     public decimal PricePerPerson { get; set; }
     public decimal TotalPrice { get; set; }
-    public string? HotelName { get; set; }
-    public decimal? HotelPrice { get; set; }
+    public string HotelInfo { get; set; }
 }
