@@ -16,7 +16,8 @@ public static class MauiProgram
 
         builder.Services.AddMauiBlazorWebView();
         builder.Services.AddMudServices();
-        builder.Services.AddSingleton<Services.IFlightService, Services.FlightService>();   
+        builder.Services.AddSingleton<Services.IFlightService, Services.FlightService>();
+        builder.Services.AddSingleton<Services.NavMenuHide>();
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();
         builder.Logging.AddDebug();

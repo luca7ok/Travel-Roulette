@@ -138,3 +138,10 @@ h1:focus {
         padding-bottom: 70px; /* Must match the new .sidebar height */
     }
 }
+.center-container {
+    display: flex !important;
+    width: 100%;
+    
+    align-items: center !important;
+    justify-content: center !important;
+}

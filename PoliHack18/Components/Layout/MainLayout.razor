@@ -1,12 +1,15 @@
 ﻿@inherits LayoutComponentBase
+
+@inject NavMenuHide ok
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
+    @if (ok.IsUserLoggedIn)
+    {
+        <div class="sidebar">
+            <NavMenu />
     </div>
+    }
     <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
+        
 
         <article class="content px-4">
             @Body
@@ -15,7 +18,19 @@
     
 
 </div>
+@code {
+    protected override void OnInitialized()
+    {
+        
+        ok.OnChange += StateHasChanged;
+    }
 
+    public void Dispose()
+    {
+        
+        ok.OnChange -= StateHasChanged;
+    }
+}
 
 @* Required *@
 <MudThemeProvider />
