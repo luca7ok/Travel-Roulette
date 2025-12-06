@@ -1,6 +1,8 @@
 ﻿@page "/"
 @inject NavigationManager NavManager
 @inject NavMenuHide ok
+@inject AuthService authService
+@using System.Data
 <PageTitle>Login</PageTitle>
 <MudContainer Class="center-container">
 <MudContainer MaxWidth="MaxWidth.ExtraSmall" >
@@ -19,7 +21,8 @@
                     AdornmentIcon="@Icons.Material.Filled.Email" 
                     Required="true" 
                     Immediate="true"
-                    Class="mb-4" />
+                    Class="mb-4"
+                    @bind-Value="emailInput"/>
 
                 @* Password Input Field *@
                 <MudTextField T="string"
@@ -29,16 +32,18 @@
                     AdornmentIcon="@Icons.Material.Filled.Lock" 
                     Required="true" 
                     Immediate="true"
-                    Class="mb-6" />
+                    Class="mb-6" 
+                    @bind-Value="passwordInput"/>
 
                 @* Login Button *@
                 <MudButton 
-                    ButtonType="ButtonType.Submit" 
+                    ButtonType="ButtonType.Button" 
                     Variant="Variant.Filled" 
                     Color="Color.Primary" 
                     Size="Size.Large" 
                     EndIcon="@Icons.Material.Filled.Login" 
-                    FullWidth="true">
+                    FullWidth="true"
+                    @onclick="HandleLogin">
                     LOG IN
                 </MudButton>
                     <MudText Align="Align.Center" Class="mt-4">
@@ -81,6 +86,41 @@
 <button class="btn btn-primary" @onclick="Afiseaza">Click me</button>
 @code
 {
+    private string emailInput = string.Empty;
+    private string passwordInput = string.Empty;
+    private string errorMessage = string.Empty;
+
+    private void HandleLogin()
+    {
+        errorMessage = string.Empty; // Clear previous error
+
+        var result = authService.LoginUser(emailInput, passwordInput, out DataRow? userData);
+
+        if (result == AuthService.LoginResult.Success && userData != null)
+        {
+            string userId = userData["id"].ToString();
+            ok.SetUserId(userId);
+
+            NavManager.NavigateTo("/flight-test");
+
+            Application.Current.MainPage.DisplayAlert("Login Success", $"Welcome, {userData["email"]}.", "OK");
+        }
+        else
+        {
+            // 5. Login failed, set error message
+            errorMessage = result switch
+            {
+                AuthService.LoginResult.UserNotFound => "Email not found. Please check your email address.",
+                AuthService.LoginResult.InvalidCredentials => "Invalid password. Please try again.",
+                AuthService.LoginResult.DatabaseError => "A service error occurred. Please try again later.",
+                _ => "An unknown error occurred."
+            };
+            Application.Current.MainPage.DisplayAlert("Login not succeded", "Wrong email/password", "OK");
+        }
+    }
+
+
+
     private void ID()
     {
         ok.SetUserId("DASDAS");

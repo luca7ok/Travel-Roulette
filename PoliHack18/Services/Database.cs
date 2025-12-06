@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using Npgsql;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Npgsql;
 namespace PoliHack18.Services
 {
     public static class Database
@@ -107,5 +108,6 @@ namespace PoliHack18.Services
                 return dt;
             }
         }
+        
     }
 }
