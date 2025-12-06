@@ -34,8 +34,12 @@
         <AndroidPackageFormat>apk</AndroidPackageFormat>
         <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
         <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
-        <PublishTrimmed>true</PublishTrimmed>
-    </PropertyGroup>
+		<PublishTrimmed>false</PublishTrimmed>  
+		<AndroidLinkMode>None</AndroidLinkMode>  
+		<RunAOTCompilation>false</RunAOTCompilation> 
+
+
+	</PropertyGroup>
 
     <ItemGroup>
         <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />

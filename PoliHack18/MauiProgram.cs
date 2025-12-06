@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using System.Reflection;
 using Npgsql;
 using PoliHack18.Services;
+using System.Globalization;
 namespace PoliHack18;
 
 public static class MauiProgram
@@ -36,6 +37,15 @@ public static class MauiProgram
         {
             Console.WriteLine($"Database initialization failed: {ex.Message}");
         }
+
+        CultureInfo customCulture = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+        customCulture.NumberFormat.NumberDecimalSeparator = ".";
+        customCulture.NumberFormat.CurrencyDecimalSeparator = "."; // Important for currency
+
+        CultureInfo.DefaultThreadCurrentCulture = customCulture;
+        CultureInfo.DefaultThreadCurrentUICulture = customCulture;
+
+
         builder.Services.AddSingleton<AuthService>();
 
         builder.Services.AddMauiBlazorWebView();
