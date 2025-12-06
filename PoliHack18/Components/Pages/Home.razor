@@ -3,18 +3,15 @@
 @inject NavMenuHide ok
 @inject AuthService authService
 @using System.Data
-@using MudBlazor
-@using PoliHack18.Themes
 <PageTitle>Login</PageTitle>
-<MudThemeProvider Theme="@AppTheme.Default" IsDarkMode="true"/>
 <MudContainer Class="center-container">
-    <MudContainer MaxWidth="MaxWidth.ExtraSmall">
-        <MudCard Elevation="25" Class="pa-8">
-            <MudCardHeader>
-                <MudText Typo="Typo.h5" Class="mb-4">Welcome Back!</MudText>
-            </MudCardHeader>
-            <MudCardContent>
-                <MudForm>
+<MudContainer MaxWidth="MaxWidth.ExtraSmall" >
+    <MudCard Elevation="25" Class="pa-8">
+        <MudCardHeader>
+            <MudText Typo="Typo.h5" Class="mb-4">Welcome Back!</MudText>
+        </MudCardHeader>
+          <MudCardContent>
+            <MudForm>
 
                 @* Email Input Field *@
                 <MudTextField T="string"
@@ -49,42 +46,14 @@
                     @onclick="HandleLogin">
                     LOG IN
                 </MudButton>
-                    <MudTextField T="string"
-                                  Label="Email Address"
-                                  InputType="InputType.Email"
-                                  Adornment="Adornment.Start"
-                                  AdornmentIcon="@Icons.Material.Filled.Email"
-                                  Required="true"
-                                  Immediate="true"
-                                  Class="mb-4"/>
-
-                    <MudTextField T="string"
-                                  Label="Password"
-                                  InputType="InputType.Password"
-                                  Adornment="Adornment.Start"
-                                  AdornmentIcon="@Icons.Material.Filled.Lock"
-                                  Required="true"
-                                  Immediate="true"
-                                  Class="mb-6"/>
-
-                    <MudButton
-                        ButtonType="ButtonType.Submit"
-                        Variant="Variant.Filled"
-                        Color="Color.Primary"
-                        Size="Size.Large"
-                        EndIcon="@Icons.Material.Filled.Login"
-                        FullWidth="true">
-                        LOG IN
-                    </MudButton>
                     <MudText Align="Align.Center" Class="mt-4">
                         <MudLink Href="/flight-test" Color="Color.Primary">
                             Still don't have an account?
                         </MudLink>
                     </MudText>
-                </MudForm>
+            </MudForm>
             </MudCardContent>
-        </MudCard>
-    </MudContainer>
+              </MudCard>    
 </MudContainer>
 </MudContainer>
 <button @onclick="ID">BagaNAvu</button>
@@ -180,8 +149,4 @@
 
         s = dt.ToString();
     }
-
-@code
-{
-    
 }
