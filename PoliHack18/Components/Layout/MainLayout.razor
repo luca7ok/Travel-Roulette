@@ -1,42 +1,41 @@
-﻿@inherits LayoutComponentBase
+﻿@using PoliHack18.Themes
+@inherits LayoutComponentBase
 @inject NavMenuHide ok
 <div class="page">
-     @if (ok.IsUserLoggedIn)
+    @if (ok.IsUserLoggedIn)
     {
         <div class="sidebar">
-            <NavMenu />
-    </div>
+            <NavMenu/>
+        </div>
     }
     <main>
-        
+
 
         <article class="content px-4">
             @Body
         </article>
     </main>
-    
+
 
 </div>
+
 @code {
+    MudTheme _appTheme = AppTheme.Default;
     protected override void OnInitialized()
     {
-
         ok.OnChange += StateHasChanged;
     }
 
     public void Dispose()
     {
-
         ok.OnChange -= StateHasChanged;
     }
+
 }
 
-@* Required *@
-<MudThemeProvider />
-<MudPopoverProvider />
+<MudThemeProvider Theme="@_appTheme" IsDarkMode="true"/>
+<MudPopoverProvider/>
 
-@* Needed for dialogs *@
-<MudDialogProvider />
+<MudDialogProvider/>
 
-@* Needed for snackbars *@
-<MudSnackbarProvider />
+<MudSnackbarProvider/>

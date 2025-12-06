@@ -6,9 +6,8 @@
 @inject ISnackbar Snackbar
 
 <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-8">
-    <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-6">✈️ Flight & Hotel Roulette</MudText>
+    <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-6">Flight & Hotel Roulette</MudText>
     <MudText Typo="Typo.body1" Align="Align.Center" Color="Color.Secondary" Class="mb-4">
-        Discover your next complete trip (Flight + Housing) within your budget
     </MudText>
 
     <MudPaper Class="pa-6" Elevation="3">
@@ -54,9 +53,7 @@
                                Variant="Variant.Outlined"
                                MinDate="@(_departureDate ?? DateTime.Today)"
                                Adornment="Adornment.Start"
-                               AdornmentIcon="@Icons.Material.Filled.DateRange"
-                               Clearable="true"
-                               HelperText="Required for hotel search"/>
+                               AdornmentIcon="@Icons.Material.Filled.DateRange"/>
             </MudItem>
 
             <MudItem xs="12">

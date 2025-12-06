@@ -1,77 +1,58 @@
 ﻿@page "/"
 @inject NavigationManager NavManager
 @inject NavMenuHide ok
+@using MudBlazor
+@using PoliHack18.Themes
 <PageTitle>Login</PageTitle>
+<MudThemeProvider Theme="@AppTheme.Default" IsDarkMode="true"/>
 <MudContainer Class="center-container">
-<MudContainer MaxWidth="MaxWidth.ExtraSmall" >
-    <MudCard Elevation="25" Class="pa-8">
-        <MudCardHeader>
-            <MudText Typo="Typo.h5" Class="mb-4">Welcome Back!</MudText>
-        </MudCardHeader>
-          <MudCardContent>
-            <MudForm>
+    <MudContainer MaxWidth="MaxWidth.ExtraSmall">
+        <MudCard Elevation="25" Class="pa-8">
+            <MudCardHeader>
+                <MudText Typo="Typo.h5" Class="mb-4">Welcome Back!</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudForm>
 
-                @* Email Input Field *@
-                <MudTextField T="string"
-                    Label="Email Address" 
-                    InputType="InputType.Email" 
-                    Adornment="Adornment.Start" 
-                    AdornmentIcon="@Icons.Material.Filled.Email" 
-                    Required="true" 
-                    Immediate="true"
-                    Class="mb-4" />
+                    <MudTextField T="string"
+                                  Label="Email Address"
+                                  InputType="InputType.Email"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Email"
+                                  Required="true"
+                                  Immediate="true"
+                                  Class="mb-4"/>
 
-                @* Password Input Field *@
-                <MudTextField T="string"
-                    Label="Password" 
-                    InputType="InputType.Password" 
-                    Adornment="Adornment.Start" 
-                    AdornmentIcon="@Icons.Material.Filled.Lock" 
-                    Required="true" 
-                    Immediate="true"
-                    Class="mb-6" />
+                    <MudTextField T="string"
+                                  Label="Password"
+                                  InputType="InputType.Password"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Lock"
+                                  Required="true"
+                                  Immediate="true"
+                                  Class="mb-6"/>
 
-                @* Login Button *@
-                <MudButton 
-                    ButtonType="ButtonType.Submit" 
-                    Variant="Variant.Filled" 
-                    Color="Color.Primary" 
-                    Size="Size.Large" 
-                    EndIcon="@Icons.Material.Filled.Login" 
-                    FullWidth="true">
-                    LOG IN
-                </MudButton>
+                    <MudButton
+                        ButtonType="ButtonType.Submit"
+                        Variant="Variant.Filled"
+                        Color="Color.Primary"
+                        Size="Size.Large"
+                        EndIcon="@Icons.Material.Filled.Login"
+                        FullWidth="true">
+                        LOG IN
+                    </MudButton>
                     <MudText Align="Align.Center" Class="mt-4">
                         <MudLink Href="/flight-test" Color="Color.Primary">
                             Still don't have an account?
                         </MudLink>
                     </MudText>
-            </MudForm>
+                </MudForm>
             </MudCardContent>
-              </MudCard>    
+        </MudCard>
+    </MudContainer>
 </MudContainer>
-</MudContainer>
-<button @onclick="ID">BagaNAvu</button>
-<button @onclick="ID1">StergeNAvu</button>
-<button @onclick="Parola">VerificaHash</button>
+
 @code
 {
-    private void ID()
-    {
-        ok.SetUserId("DASDAS");
-        Application.Current.MainPage.DisplayAlert("Text", "DA", "Cancel");
-    }
-    private void ID1()
-    {
-        ok.SetUserId("");
-        Application.Current.MainPage.DisplayAlert("Text", "DA", "Cancel");
-    }
-    private void Parola()
-    {
-        string parola = "Parola123";
-        string hashparola = Password.HashPassword(parola);
-         Debug.WriteLine($"Parola este{parola},iar hash:{hashparola}");
-        bool parola2=Password.VerifyPassword(parola,hashparola);
-        Debug.WriteLine($"Raspunsul:{parola2}");
-    }
+    
 }

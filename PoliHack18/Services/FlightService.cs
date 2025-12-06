@@ -98,7 +98,7 @@ namespace PoliHack18.Services
                     if (remainingBudget < (30 * duration * criteria.NumberOfPeople)) continue;
 
                     var depDate = flight.GetProperty("departureDate").GetString();
-                    var retDate = flight.GetProperty("returnDate").GetString();
+                    var retDate = criteria.ReturnDate.ToString();
 
                     var hotelOffer = await GetHotelForTrip(destCode, depDate, retDate, criteria.NumberOfPeople,
                         remainingBudget, token);
