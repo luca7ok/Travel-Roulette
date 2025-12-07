@@ -5,7 +5,43 @@
 @using System.Data
 
 <PageTitle>Login</PageTitle>
+<style>
+    .login-wrapper {
+        position: relative;
+        min-height: 100vh;
+        width: 100%;
+        overflow: hidden;
+        background-color: #f0f0f0;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
 
+    .login-wrapper::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+
+        background-image: url("images/map.png");
+        background-repeat: repeat;
+        background-size: 300px;
+
+        transform: rotate(-45deg);
+        opacity: 0.1;
+
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    .content-layer {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+    }
+</style>
 <MudContainer Class="center-container" Style="margin-top: 15vh;">
     <MudContainer MaxWidth="MaxWidth.ExtraSmall">
         <MudCard Elevation="25" Class="pa-8" Style="background-color:#cfcbc4; font-size: 18px">
@@ -99,7 +135,7 @@
                     string userId = userData["id"].ToString();
                     ok.SetUserId(userId);
 
-                    NavManager.NavigateTo("/flight-test");
+                    NavManager.NavigateTo("/flight-test", replace: true);
                 }
                 else
                 {

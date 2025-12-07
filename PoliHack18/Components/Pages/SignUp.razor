@@ -87,7 +87,7 @@
                             }
                             else
                             {
-                                <span>Make New Account</span>
+                                <span>Create Account</span>
                             }
 
                         </MudButton>
@@ -107,7 +107,6 @@
 </MudContainer>
 
 @code {
-
 
     private class SignUpModel
     {
@@ -237,7 +236,6 @@
 
     private void GoBack()
     {
-        NavManager.NavigateTo("/");
+        NavManager.NavigateTo("/", replace: true);
     }
-
 }

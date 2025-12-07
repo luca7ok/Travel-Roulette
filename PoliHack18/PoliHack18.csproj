@@ -59,6 +59,7 @@
         <Content Remove="docfx.json" />
         <None Remove="docfx.json" />
         <MauiAsset Remove="docfx.json" />
+        <None Include="wwwroot\images\map.png" />
     </ItemGroup>
 
     <ItemGroup>
