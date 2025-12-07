@@ -7,9 +7,9 @@
 
 <MudContainer Class="center-container">
     <MudContainer MaxWidth="MaxWidth.ExtraSmall">
-        <MudCard Elevation="25" Class="pa-8" Style="background-color:#EFE2D2">
+        <MudCard Elevation="25" Class="pa-8">
             <MudCardHeader>
-                <MudText Typo="Typo.h4" Class="mb-4">Create Your Account</MudText>
+                <MudText Typo="Typo.h5" Class="mb-4">Create Your Account</MudText>
             </MudCardHeader>
             <MudCardContent>
                 <MudForm @ref="@form" @bind-IsValid="@success">
@@ -23,7 +23,7 @@
                                   Validation="@(new Func<string, string>(NameValidation))"
                                   Required="true"
                                   Immediate="true"
-                                  Class="mb-4"/>
+                                  Class="mb-4" />
 
                     @* Email Input Field *@
                     <MudTextField T="string" Label="Email Address"
@@ -35,7 +35,7 @@
                                   Validation="@(new Func<string, string>(EmailValidation))"
                                   Required="true"
                                   Immediate="true"
-                                  Class="mb-4"/>
+                                  Class="mb-4" />
 
                     @* Password Input Field *@
                     <MudTextField T="string" Label="Password"
@@ -47,7 +47,7 @@
                                   Validation="@(new Func<string, string>(PasswordValidation))"
                                   Required="true"
                                   Immediate="true"
-                                  Class="mb-4"/>
+                                  Class="mb-4" />
 
                     @* Age Input Field *@
                     <MudTextField T="int?" Label="Age"
@@ -58,11 +58,11 @@
                                   @bind-Value="model.Age"
                                   For="@(() => model.Age)"
                                   Validation="@(new Func<int?, string>(AgeValidation))"
-
+                                  
                                   Required="true"
                                   Immediate="true"
-                                  Class="mb-4"
-                                  Min="0"/>
+                                  Class="mb-4" 
+                                  Min="0" />
 
                     @* Phone Number Input Field *@
                     <MudTextField T="string" Label="Phone Number"
@@ -74,7 +74,7 @@
                                   Validation="@(new Func<string, string>(PhoneValidation))"
                                   Required="true"
                                   Immediate="true"
-                                  Class="mb-6"/>
+                                  Class="mb-6" />
 
                     @* --- Action Buttons --- *@
                     <div class="d-flex justify-space-between align-center">
@@ -88,14 +88,14 @@
                                    OnClick="HandleSignUp">
                             @if (isLoading)
                             {
-                                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+                                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
                                 <MudText Class="ms-2">Creating Account...</MudText>
                             }
                             else
                             {
                                 <span>Make New Account</span>
                             }
-
+                            
                         </MudButton>
 
                         @* Go Back Button *@
@@ -116,6 +116,9 @@
 @code {
 
 
+
+
+
     private class SignUpModel
     {
         public string Name { get; set; } = string.Empty;
@@ -127,8 +130,9 @@
 
     private SignUpModel model = new SignUpModel();
     private MudForm form;
-    private bool success;
-    private bool isLoading = false;
+    private bool success; 
+    private bool isLoading = false; 
+
 
 
     private string NameValidation(string name)
@@ -164,7 +168,7 @@
         if (age < 0)
             return "Age cannot be negative.";
         if (age < 18)
-            return "You must be 18 or older to sign up.";
+            return "You must be 18 or older to sign up.";      
         return null;
     }
 
@@ -180,35 +184,68 @@
 
     private async Task HandleSignUp()
     {
-        await form.Validate();
+        await form.Validate(); 
 
         if (success)
         {
             isLoading = true;
             StateHasChanged();
 
-
-            User new_user = new User()
+            try
             {
-                Email = model.Email,
-                Password = model.Password,
-                Age = model.Age.Value,
-                Name = model.Name,
-                PhoneNumber = model.PhoneNumber,
-            };
-            UserRepository repo = new UserRepository();
-            await repo.AddUser(new_user);
-            SnackbarService.Add("Account created successfully! Redirecting...", Severity.Success, config =>
+                UserRepository _userRepository = new UserRepository();
+             
+                bool exists = await _userRepository.CheckEmailExistsAsync(model.Email);
+
+                
+                if (exists == true)
+                {
+                    SnackbarService.Add("This email is already registered.", Severity.Warning, config =>
+                    {
+                        config.ShowCloseIcon = true;
+                        config.VisibleStateDuration = 5000; 
+                    });
+                    return;
+                }
+
+               
+                User new_user = new User()
+                {
+                    Email = model.Email,
+
+                    Password = model.Password,
+
+                    Age = model.Age.Value,
+
+                    Name = model.Name,
+
+                    PhoneNumber = model.PhoneNumber,
+                };
+
+                await _userRepository.AddUser(new_user);
+
+                SnackbarService.Add("Account created successfully! Redirecting...", Severity.Success, config =>
+                {
+                    config.ShowCloseIcon = false;
+                    config.VisibleStateDuration = 3000;
+                });
+
+                await Task.Delay(500);
+                NavManager.NavigateTo("/");
+            }
+            catch (Exception ex)
             {
-                config.ShowCloseIcon = false;
-                config.VisibleStateDuration = 3000; // Disappears after 3 seconds (3000ms)
-            });
-
-            await Task.Delay(500);
-
-            StateHasChanged();
-            isLoading = false;
-            NavManager.NavigateTo("/");
+                Console.WriteLine($"Signup Error: {ex.Message}");
+                SnackbarService.Add("Registration failed due to a server error. Please try again.", Severity.Error, config =>
+                {
+                    config.VisibleStateDuration = 10000;
+                });
+            }
+            finally
+            {
+                isLoading = false;
+                StateHasChanged();
+            }
         }
     }
 
@@ -216,5 +253,4 @@
     {
         NavManager.NavigateTo("/");
     }
-
 }
