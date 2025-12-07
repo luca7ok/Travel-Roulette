@@ -7,10 +7,12 @@
 <PageTitle>Login</PageTitle>
 
 <MudContainer Class="center-container" Style="margin-top: 15vh;">
-    <MudContainer MaxWidth="MaxWidth.ExtraSmall" >
-        <MudCard Elevation="25" Class="pa-8" Style="background-color:#EFE2D2">
-            <MudCardHeader>
-                <MudText Typo="Typo.h4" Class="mb-4">Welcome Back!</MudText>
+    <MudContainer MaxWidth="MaxWidth.ExtraSmall">
+        <MudCard Elevation="25" Class="pa-8" Style="background-color:#cfcbc4; font-size: 18px">
+            <MudCardHeader Style="text-align: center">
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h4" Class="mb-4" Align="Align.Center">Login</MudText>
+                </CardHeaderContent>
             </MudCardHeader>
             <MudCardContent>
                 <MudForm>
@@ -24,6 +26,8 @@
                                   Immediate="true"
                                   Class="mb-4"
                                   Disabled="@isLoading"
+                                  Style="color: black;"
+                                  Margin="Margin.Dense"
                                   @bind-Value="emailInput"/>
 
                     <MudTextField T="string"
@@ -35,11 +39,13 @@
                                   Immediate="true"
                                   Class="mb-6"
                                   Disabled="@isLoading"
+                                  Style="color: black"
+                                  Margin="Margin.Dense"
                                   @bind-Value="passwordInput"/>
 
                     <MudButton ButtonType="ButtonType.Button"
                                Variant="Variant.Filled"
-                               Color="Color.Primary"
+                               Style="background-color:#9c8c69; color:#cfcbc4"
                                Size="Size.Large"
                                EndIcon="@(isLoading ? null : Icons.Material.Filled.Login)"
                                FullWidth="true"
@@ -57,7 +63,7 @@
                     </MudButton>
 
                     <MudText Align="Align.Center" Class="mt-4">
-                        <MudLink Href="/sign-up" Color="Color.Primary">
+                        <MudLink Href="/sign-up" Style="color:#9c8c69">
                             Still don't have an account?
                         </MudLink>
                     </MudText>
@@ -66,6 +72,7 @@
         </MudCard>
     </MudContainer>
 </MudContainer>
+
 
 @code
 {

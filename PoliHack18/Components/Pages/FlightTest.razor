@@ -6,11 +6,11 @@
 @inject ISnackbar Snackbar
 
 <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-8">
-    <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-6">Trip Roulette</MudText>
+    <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-6" Style="color: white">Travel Roulette</MudText>
     <MudText Typo="Typo.body1" Align="Align.Center" Color="Color.Secondary" Class="mb-4">
     </MudText>
 
-    <MudPaper Class="pa-6" Elevation="3">
+    <MudPaper Class="pa-6" Elevation="3" Style="margin-top: 5vh; background-color:#cfcbc4">
         <MudGrid>
             <MudItem xs="12" sm="6">
                 <MudSelect T="string"
@@ -30,6 +30,7 @@
 
             <MudItem xs="12" sm="6">
                 <MudDatePicker @bind-Date="_departureDate"
+                               @bind-Date:after="HandleDepartureDateChange" 
                                Label="Departure Date"
                                Variant="Variant.Outlined"
                                MinDate="@DateTime.Today"
@@ -41,7 +42,7 @@
                 <MudDatePicker @bind-Date="_returnDate"
                                Label="Return Date"
                                Variant="Variant.Outlined"
-                               MinDate="@(_departureDate ?? DateTime.Today)"
+                               MinDate="@(_departureDate?.AddDays(1) ?? DateTime.Today.AddDays(1))"
                                Adornment="Adornment.Start"
                                AdornmentIcon="@Icons.Material.Filled.DateRange"/>
             </MudItem>
@@ -58,7 +59,7 @@
 
             <MudItem xs="12">
                 <MudButton Variant="Variant.Filled"
-                           Color="Color.Primary"
+                           Style="background-color: #9E7448; color: white"
                            FullWidth="true"
                            OnClick="FindRandomFlight"
                            Disabled="@_isLoading"
@@ -78,87 +79,22 @@
         </MudGrid>
     </MudPaper>
 
-    @if (_selectedTrip != null)
+    @if (_selectedTrip != null && _hasSearched)
     {
-        <MudCard Class="mt-6 animate-fade-in" Elevation="4">
-            <MudCardHeader>
-                <CardHeaderAvatar>
-                    <MudAvatar Color="Color.Primary" Size="Size.Large">
-                        <MudIcon Icon="@Icons.Material.Filled.LocationCity"/>
-                    </MudAvatar>
-                </CardHeaderAvatar>
-                <CardHeaderContent>
-                    <MudText Typo="Typo.h5">Trip to @_selectedTrip.Destination</MudText>
-                    <MudText Typo="Typo.body2" Color="Color.Secondary">Full Package Found!</MudText>
-                </CardHeaderContent>
-            </MudCardHeader>
-            
-            <MudCardContent>
-                <MudGrid Class="mb-4">
-                    <MudItem xs="12" sm="6">
-                        <MudPaper Class="pa-3" Elevation="0" Outlined="true">
-                            <MudStack Row="true" AlignItems="AlignItems.Center">
-                                <MudIcon Icon="@Icons.Material.Filled.Flight" Color="Color.Info" Size="Size.Large"/>
-                                <div>
-                                    <MudText Typo="Typo.subtitle1"><b>Flight</b></MudText>
-                                    <MudText Typo="Typo.body2">@_selectedTrip.FlightInfo</MudText>
-                                </div>
-                            </MudStack>
-                        </MudPaper>
-                    </MudItem>
-
-                    <MudItem xs="12" sm="6">
-                        <MudPaper Class="pa-3" Elevation="0" Outlined="true">
-                            <MudStack Row="true" AlignItems="AlignItems.Center">
-                                <MudIcon Icon="@Icons.Material.Filled.Hotel" Color="Color.Warning" Size="Size.Large"/>
-                                <div>
-                                    <MudText Typo="Typo.subtitle1"><b>Accommodation</b></MudText>
-                                    @if (!string.IsNullOrEmpty(_selectedTrip.HotelInfo))
-                                    {
-                                        <MudText Typo="Typo.body2">@_selectedTrip.HotelInfo</MudText>
-                                    }
-                                    else
-                                    {
-                                        <MudText Typo="Typo.body2" Color="Color.Error">No hotel found within remaining budget.</MudText>
-                                    }
-                                </div>
-                            </MudStack>
-                        </MudPaper>
-                    </MudItem>
-                </MudGrid>
-
-                <MudDivider Class="my-4"/>
-
-                <MudGrid Justify="Justify.SpaceAround">
-                    <MudItem xs="6" Class="text-center">
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">Package Per Person</MudText>
-                        <MudText Typo="Typo.h5" Color="Color.Primary">
-                            €@_selectedTrip.PricePerPerson.ToString("F2")
-                        </MudText>
-                    </MudItem>
-                    <MudItem xs="6" Class="text-center">
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">Total Trip Cost</MudText>
-                        <MudText Typo="Typo.h5" Color="Color.Success">
-                            <b>€@_selectedTrip.TotalPrice.ToString("F2")</b>
-                        </MudText>
-                    </MudItem>
-                </MudGrid>
-
-                @if (_numberOfPeople > 1)
-                {
-                    <MudText Typo="Typo.body2" Align="Align.Center" Color="Color.Secondary" Class="mt-2">
-                        Includes Flight + Hotel for @_numberOfPeople travelers
-                    </MudText>
-                }
-            </MudCardContent>
-        </MudCard>
+        <MudAlert Severity="Severity.Success" Class="mt-4 animate-fade-in" Variant="Variant.Filled"
+                  Style="background-color: #9C8C69">
+            <MudText Typo="Typo.h6"><strong>Trip Found!</strong></MudText>
+            <MudText Typo="Typo.body2" Class="mt-1">
+                A trip has been found within your budget!
+            </MudText>
+        </MudAlert>
     }
     else if (_hasSearched && !_isLoading)
     {
         <MudAlert Severity="Severity.Warning" Class="mt-4" Variant="Variant.Filled">
             <MudText Typo="Typo.body1"><strong>No complete trips found!</strong></MudText>
             <MudText Typo="Typo.body2" Class="mt-1">
-               @Class1.s
+                @Class1.s
             </MudText>
         </MudAlert>
     }
@@ -189,7 +125,7 @@
     private string _origin = "CLJ";
     private int _numberOfPeople = 1;
     private decimal _maxPrice = 1500;
-    private DateTime? _departureDate = DateTime.Today.AddDays(1); 
+    private DateTime? _departureDate = DateTime.Today.AddDays(1);
     private DateTime? _returnDate = DateTime.Today.AddDays(8);
 
     private TripOption? _selectedTrip;
@@ -236,10 +172,7 @@
                 ReturnDate = _returnDate.Value
             };
 
-            await Task.Run(async () => 
-            { 
-                _selectedTrip = await FlightService.GetRandomFlight(criteria); 
-            });
+            await Task.Run(async () => { _selectedTrip = await FlightService.GetRandomFlight(criteria); });
 
             if (_selectedTrip == null)
             {
@@ -261,4 +194,20 @@
             _isLoading = false;
         }
     }
+
+    private async Task HandleDepartureDateChange()
+    {
+        if (_departureDate.HasValue)
+        {
+            var requiredMinReturnDate = _departureDate.Value.AddDays(1);
+
+            if (!_returnDate.HasValue || _returnDate.Value < requiredMinReturnDate)
+            {
+                _returnDate = requiredMinReturnDate;
+            }
+
+            StateHasChanged();
+        }
+    }
+
 }

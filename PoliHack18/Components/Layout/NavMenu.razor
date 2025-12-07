@@ -1,47 +1,43 @@
-﻿@* NavMenu.razor *@
+﻿<style>
+    .horizontal-nav {
+        display: flex !important;
+        background: #2F3630 !important;
+        padding: 1rem 0 !important;
+    }
+    
+    .horizontal-nav .mud-nav-link {
+        color: #CFCBC4 !important;
+    }
+    
+    .horizontal-nav .mud-nav-link:hover {
+        background-color: transparent !important;
+    }
+    
+    .horizontal-nav .mud-nav-link.active {
+        color: #EFE2D2 !important;
+        background-color: transparent !important;
+    }
+    
+    .horizontal-nav .mud-nav-link .mud-icon-root {
+        user-select: none !important;
+        color: #CFCBC4 !important;
+    }
+    
+    .horizontal-nav .mud-nav-link.active .mud-icon-root {
+        color: #EFE2D2 !important;
+    }
+</style>
 
-<MudNavMenu Class="horizontal-nav" Style="">
+<MudNavMenu Class="horizontal-nav">
     <MudNavLink Href="flight-test"
                 Icon="@Icons.Material.Filled.Flight"
-                IconColor="Color.Primary"
                 Match="NavLinkMatch.All">
         New Trip
     </MudNavLink>
 
     <MudNavLink Href="my-trips"
                 Icon="@Icons.Material.Filled.Book"
-                IconColor="Color.Primary"
                 Match="NavLinkMatch.All">
         My History
     </MudNavLink>
 </MudNavMenu>
-
-<style>
-    .horizontal-nav {
-        display: flex;
-        flex-direction: row;
-        gap: 8px;
-        align-items: center;
-    }
-
-    .mud-nav-link {
-        padding: 12px 24px;
-        border-radius: 8px;
-        margin: 0;
-        transition: all 0.2s ease;
-    }
-
-    .mud-nav-link:hover {
-        background-color: #e3f2fd;
-    }
-
-    .mud-nav-link.active {
-        background-color: #bbdefb;
-        color: #1976d2;
-        font-weight: 500;
-    }
-
-    .mud-nav-link .mud-icon-root {
-        margin-right: 12px;
-    }
-</style>

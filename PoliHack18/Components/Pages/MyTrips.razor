@@ -1,13 +1,12 @@
 @page "/my-trips"
 @using PoliHack18.Models
-@using PoliHack18.Services;
 @using PoliHack18.Repository
 @inject NavigationManager NavManager
 @implements IDisposable
 
-<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4 px-3">
-    <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4"
-             Style="font-size: 2rem; color: #ffffff; margin-top:-10px">My Trips
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-8">
+    <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-6" Style="color: white">My Trips</MudText>
+    <MudText Typo="Typo.body1" Align="Align.Center" Color="Color.Secondary" Class="mb-4">
     </MudText>
 
     @if (isLoading)
@@ -31,7 +30,9 @@
                      Class="mb-3"
                      Style="font-size: 48px; opacity: 0.3; color:#27120F"/>
             <MudText Typo="Typo.h6" Class="mb-2" Style="color:#27120F; font-size: 1.1rem;">No trips yet</MudText>
-            <MudText Color="Color.Default" Class="mb-4" Style="color:#27120F; font-size: 0.9rem;">You haven't saved any trips yet.</MudText>
+            <MudText Color="Color.Default" Class="mb-4" Style="color:#27120F; font-size: 0.9rem;">You haven't saved any
+                trips yet.
+            </MudText>
             <MudButton Variant="Variant.Filled"
                        Style="background-color: #743725;color:#EFE2D2; border-radius: 24px; padding: 10px 24px;"
                        StartIcon="@Icons.Material.Filled.Search"
@@ -44,41 +45,40 @@
     }
     else
     {
-        <MudStack Spacing="3">
-            @foreach (var trip in MySavedTrips.OrderBy(t => GetDepartureDate(t)))
+        <MudStack Spacing="3" Style="margin-top: 5vh">
+            @foreach (var trip in MySavedTrips.OrderByDescending(t => GetDepartureDate(t)))
             {
                 bool isUnlocked = IsTripUnlocked(trip);
 
                 @if (isUnlocked)
                 {
-                    <MudCard Elevation="3" 
+                    <MudCard Elevation="3"
                              Class="trip-card-mobile"
                              Style="border-radius: 16px; overflow: hidden;"
                              @onclick="@(() => ShowTripDetails(trip))">
-                        <MudCardHeader Style="background: linear-gradient(135deg, #743725 0%, #8d4830 100%); color: #ffffff; padding: 12px 16px;">
+                        <MudCardHeader Style="background: #2F3630;color: #ffffff; padding: 12px 16px;">
                             <CardHeaderContent>
                                 <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
                                     <div>
-                                        <MudText Typo="Typo.h6" Style="color:#EFE2D2; font-size: 1.1rem; margin-bottom: 4px;">
+                                        <MudText Typo="Typo.h6"
+                                                 Style="color:#EFE2D2; font-size: 1.1rem; margin-bottom: 4px;">
                                             @trip.Destination
                                         </MudText>
-                                        <MudChip T="string" Size="Size.Small" Style="height: 20px; background-color: rgba(239, 226, 210, 0.2); color: #EFE2D2;">
-                                            Unlocked
-                                        </MudChip>
                                     </div>
-                                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" 
-                                            Style="color: #EFE2D2; opacity: 0.7;"/>
+                                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight"
+                                             Style="color: #EFE2D2; opacity: 0.7;"/>
                                 </MudStack>
                             </CardHeaderContent>
                         </MudCardHeader>
-                        <MudCardContent Style="background-color: #EFE2D2; color: #27120F; padding: 16px;">
+                        <MudCardContent Style="background-color: #CFCBC4; color: #27120F; padding: 16px;">
                             <MudStack Spacing="2">
                                 <div class="d-flex align-start">
-                                    <MudIcon Icon="@Icons.Material.Filled.FlightTakeoff" 
-                                            Size="Size.Small" 
-                                            Style="color: #743725; margin-right: 8px; margin-top: 2px;"/>
+                                    <MudIcon Icon="@Icons.Material.Filled.FlightTakeoff"
+                                             Size="Size.Small"
+                                             Style="color: #743725; margin-right: 8px; margin-top: 2px;"/>
                                     <div style="flex: 1;">
-                                        <MudText Typo="Typo.caption" Style="opacity: 0.7; font-size: 0.7rem;">FLIGHT</MudText>
+                                        <MudText Typo="Typo.caption" Style="opacity: 0.7; font-size: 0.7rem;">FLIGHT
+                                        </MudText>
                                         <MudText Typo="Typo.body2" Style="font-size: 0.9rem; line-height: 1.3;">
                                             @GetCompactFlightInfo(trip)
                                         </MudText>
@@ -86,11 +86,12 @@
                                 </div>
 
                                 <div class="d-flex align-start">
-                                    <MudIcon Icon="@Icons.Material.Filled.Hotel" 
-                                            Size="Size.Small" 
-                                            Style="color: #743725; margin-right: 8px; margin-top: 2px;"/>
+                                    <MudIcon Icon="@Icons.Material.Filled.Hotel"
+                                             Size="Size.Small"
+                                             Style="color: #743725; margin-right: 8px; margin-top: 2px;"/>
                                     <div style="flex: 1;">
-                                        <MudText Typo="Typo.caption" Style="opacity: 0.7; font-size: 0.7rem;">HOTEL</MudText>
+                                        <MudText Typo="Typo.caption" Style="opacity: 0.7; font-size: 0.7rem;">HOTEL
+                                        </MudText>
                                         <MudText Typo="Typo.body2" Style="font-size: 0.9rem; line-height: 1.3;">
                                             @GetCompactHotelInfo(trip)
                                         </MudText>
@@ -98,10 +99,12 @@
                                 </div>
 
                                 <MudDivider Class="my-2" Style="opacity: 0.3;"/>
-                                
-                                <div class="d-flex justify-space-between align-center" style="background-color: rgba(116, 55, 37, 0.08); padding: 12px; border-radius: 8px; margin-top: 4px;">
+
+                                <div class="d-flex justify-space-between align-center"
+                                     style="background-color: rgba(116, 55, 37, 0.08); padding: 12px; border-radius: 8px; margin-top: 4px;">
                                     <MudText Typo="Typo.body2" Style="font-weight: 500;">Total Price</MudText>
-                                    <MudText Typo="Typo.h6" Style="color: #743725; font-weight: 600;">€@trip.TotalPrice</MudText>
+                                    <MudText Typo="Typo.h6" Style="color: #743725; font-weight: 600;">
+                                        €@trip.TotalPrice</MudText>
                                 </div>
                             </MudStack>
                         </MudCardContent>
@@ -109,13 +112,14 @@
                 }
                 else
                 {
-                    <MudCard Elevation="2" 
+                    <MudCard Elevation="2"
                              Style="border-radius: 16px; overflow: hidden; border: 2px dashed #743725; opacity: 0.85;">
                         <MudCardHeader Style="background-color: #3e2b26; color: #ffffff; padding: 12px 16px;">
                             <CardHeaderContent>
                                 <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
                                     <div>
-                                        <MudText Typo="Typo.h6" Style="color:#EFE2D2; font-size: 1.1rem; font-style: italic;">
+                                        <MudText Typo="Typo.h6"
+                                                 Style="color:#EFE2D2; font-size: 1.1rem; font-style: italic;">
                                             Locked
                                         </MudText>
                                     </div>
@@ -124,33 +128,24 @@
                             </CardHeaderContent>
                         </MudCardHeader>
 
-                        <MudCardContent Style="background-color: #dccdbb; color: #27120F; padding: 24px 16px; text-align: center;">
-                            <MudIcon Icon="@Icons.Material.Filled.LockClock"
-                                     Style="font-size: 3rem; color: #743725; opacity: 0.6;" Class="mb-2"/>
+                        <MudCardContent
+                            Style="background-color: #CFCBC4; color: #27120F; padding: 24px 16px; text-align: center;">
 
-                            <MudText Typo="Typo.h6" Align="Align.Center" Style="font-size: 1rem; margin-bottom: 8px;">
-                                Surprise Awaits!
-                            </MudText>
-
-                            <!-- Countdown timer - prominent on mobile -->
-                            <div style="background-color: rgba(116, 55, 37, 0.1); padding: 12px; border-radius: 12px; margin: 12px 0;">
-                                <MudText Typo="Typo.caption" Align="Align.Center" Style="opacity: 0.7; font-size: 0.7rem;">
+                            <div
+                                style="background-color: rgba(116, 55, 37, 0.1); padding: 12px; border-radius: 12px; margin: 12px 0;">
+                                <MudText Typo="Typo.caption" Align="Align.Center"
+                                         Style="opacity: 0.7; font-size: 0.7rem;">
                                     UNLOCKS IN
                                 </MudText>
-                                <MudText Typo="Typo.h6" Align="Align.Center" Style="color: #743725; font-weight: 600; font-size: 1.3rem;">
+                                <MudText Typo="Typo.h6" Align="Align.Center"
+                                         Style="color: #743725; font-weight: 600; font-size: 1.3rem;">
                                     @GetTimeUntilUnlock(trip)
                                 </MudText>
-                                <MudText Typo="Typo.caption" Align="Align.Center" Style="opacity: 0.6; font-size: 0.7rem; margin-top: 4px;">
+                                <MudText Typo="Typo.caption" Align="Align.Center"
+                                         Style="opacity: 0.6; font-size: 0.7rem; margin-top: 4px;">
                                     @GetUnlockDate(trip).ToString("MMM dd, HH:mm")
                                 </MudText>
                             </div>
-
-                            <MudButton Variant="Variant.Text" 
-                                      Size="Size.Small" 
-                                      StartIcon="@Icons.Material.Filled.Info"
-                                      OnClick="@(() => ShowLockExplanation())"
-                                      Style="color: #743725; font-size: 0.8rem; margin-top: 8px;">
-                            </MudButton>
                         </MudCardContent>
                     </MudCard>
                 }
@@ -172,7 +167,7 @@
     {
         var departureDate = GetDepartureDate(trip);
         if (departureDate == DateTime.MaxValue) return false;
-        
+
         var hoursUntilDeparture = (departureDate - DateTime.Now).TotalHours;
         return hoursUntilDeparture <= 24;
     }
@@ -182,10 +177,10 @@
         try
         {
             if (string.IsNullOrEmpty(trip.FlightInfo)) return DateTime.MaxValue;
-            
+
             var parts = trip.FlightInfo.Split(" to ");
             if (parts.Length < 1) return DateTime.MaxValue;
-            
+
             return DateTime.Parse(parts[0].Trim());
         }
         catch (Exception)
@@ -203,7 +198,7 @@
     {
         var unlockDate = GetUnlockDate(trip);
         var timeSpan = unlockDate - DateTime.Now;
-        
+
         if (timeSpan.TotalHours < 1)
             return "< 1 hour";
         else if (timeSpan.TotalHours < 24)
@@ -217,20 +212,20 @@
     private string GetCompactFlightInfo(TripOption trip)
     {
         if (string.IsNullOrEmpty(trip.FlightInfo)) return "Flight details unavailable";
-        
+
         if (trip.FlightInfo.Length > 50)
             return trip.FlightInfo.Substring(0, 47) + "...";
-        
+
         return trip.FlightInfo;
     }
 
     private string GetCompactHotelInfo(TripOption trip)
     {
         if (string.IsNullOrEmpty(trip.HotelInfo)) return "Hotel details unavailable";
-        
+
         if (trip.HotelInfo.Length > 50)
             return trip.HotelInfo.Substring(0, 47) + "...";
-        
+
         return trip.HotelInfo;
     }
 
@@ -254,18 +249,15 @@
     protected override void OnInitialized()
     {
         LoadTrips();
-        
-        refreshTimer = new Timer(_ => InvokeAsync(() => 
-        {
-            StateHasChanged();
-        }), null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+
+        refreshTimer = new Timer(_ => InvokeAsync(() => { StateHasChanged(); }), null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
     }
 
     private void LoadTrips()
     {
         isLoading = true;
         loadError = null;
-        
+
         if (UserSession.IsLoggedIn)
         {
             try
@@ -280,11 +272,7 @@
                 MySavedTrips = new List<TripOption>();
             }
         }
-        else
-        {
-            MySavedTrips = new List<TripOption>();
-        }
-        
+
         isLoading = false;
     }
 
@@ -303,4 +291,5 @@
     {
         refreshTimer?.Dispose();
     }
+
 }
