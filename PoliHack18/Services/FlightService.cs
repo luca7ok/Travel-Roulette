@@ -57,10 +57,6 @@ namespace PoliHack18.Services
 
         public async Task<TripOption?> GetRandomFlight(TripSearchCriteria criteria)
         {
-
-            if (!AirportData.IsEuropeanAirport(criteria.Origin))
-                throw new ArgumentException($"Origin airport '{criteria.Origin}' must be a European airport.");
-
             try
             {
                 var token = await GetAccessTokenAsync();
@@ -100,7 +96,6 @@ namespace PoliHack18.Services
                     decimal totalFlightCost = flightPricePerPerson * criteria.NumberOfPeople;
                     decimal remainingBudget = criteria.MaxPrice - totalFlightCost;
 
-
                     if (remainingBudget < (30 * duration * criteria.NumberOfPeople)) continue;
 
                     var depDate = flight.GetProperty("departureDate").GetString();
@@ -111,7 +106,11 @@ namespace PoliHack18.Services
 
                     if (hotelOffer != null)
                     {
+                        var offerJsonString = JsonSerializer.Serialize(flight);
                         Guid userID = UserSession.CurrentUserId;
+                        decimal totalCost = totalFlightCost + hotelOffer.Price;
+                        decimal commissionMultiplier = GetCommissionMultiplier(totalFlightCost + hotelOffer.Price);
+                        decimal finalTotalPrice = totalCost * commissionMultiplier;
 
                         var trip = new TripOption
                         {
@@ -121,8 +120,9 @@ namespace PoliHack18.Services
                             PricePerPerson =
                                 flightPricePerPerson +
                                 (hotelOffer.Price / criteria.NumberOfPeople),
-                            TotalPrice = totalFlightCost + hotelOffer.Price,
-                            HotelInfo = $"{hotelOffer.HotelName} ({hotelOffer.Price} {hotelOffer.Currency} total)"
+                            TotalPrice = finalTotalPrice,
+                            HotelInfo = $"{hotelOffer.HotelName} ({hotelOffer.Price} {hotelOffer.Currency} total)",
+                            FlightOfferJson = offerJsonString
                         };
 
                         try
@@ -145,7 +145,8 @@ namespace PoliHack18.Services
             {
                 Class1.s = ex.Message;
                 System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
-                MainThread.BeginInvokeOnMainThread(async () => {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
                     await Application.Current.MainPage.DisplayAlert("Error: ", ex.ToString(), "OK");
                 });
                 return null;
@@ -223,6 +224,249 @@ namespace PoliHack18.Services
             return null;
         }
 
+        private async Task<JsonElement?> ConfirmFlightPrice(JsonElement flightOffer, string token)
+        {
+            var pricingUrl = "v1/shopping/flight-offers/pricing";
+            var requestBody = new
+            {
+                data = new
+                {
+                    type = "flight-offers-pricing",
+                    flightOffers = new[] { flightOffer }
+                }
+            };
+
+            var jsonContent = new StringContent(
+                JsonSerializer.Serialize(requestBody),
+                System.Text.Encoding.UTF8,
+                "application/json"
+            );
+
+            var request = new HttpRequestMessage(HttpMethod.Post, pricingUrl);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            request.Content = jsonContent;
+
+            var response = await _httpClient.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                System.Diagnostics.Debug.WriteLine($"Pricing Error: {await response.Content.ReadAsStringAsync()}");
+                return null;
+            }
+
+            var json = JsonSerializer.Deserialize<JsonElement>(await response.Content.ReadAsStringAsync());
+
+            if (json.TryGetProperty("data", out var data) &&
+                data.TryGetProperty("flightOffers", out var validatedOffers) &&
+                validatedOffers.GetArrayLength() > 0)
+            {
+                return validatedOffers[0];
+            }
+
+            return null;
+        }
+
+        public async Task<FlightBookingResult> CreateFlightOrder(TripOption trip, User user)
+        {
+            try
+            {
+                var token = await GetAccessTokenAsync();
+                var flightOffer = JsonSerializer.Deserialize<JsonElement>(trip.FlightOfferJson);
+                var confirmedOffer = await ConfirmFlightPrice(flightOffer, token);
+
+                if (!confirmedOffer.HasValue)
+                {
+                    return new FlightBookingResult
+                    {
+                        Success = false,
+                        Message = "Flight offer is no longer valid or price changed significantly.",
+                        Trip = trip
+                    };
+                }
+
+                var amadeusTravelers = new[]
+                {
+                    new
+                    {
+                        id = "1",
+                        dateOfBirth = "1990-01-01",
+                        name = new
+                        {
+                            firstName = user.Name ?? "John",
+                            lastName = "Doe"
+                        },
+                        gender = "MALE",
+                        contact = new
+                        {
+                            emailAddress = user.Email ?? "test@example.com",
+                            phones = new[]
+                            {
+                                new
+                                {
+                                    deviceType = "MOBILE",
+                                    countryCallingCode = "40",
+                                    number = user.PhoneNumber ?? "123456789"
+                                }
+                            }
+                        },
+                        documents = new[]
+                        {
+                            new
+                            {
+                                documentType = "PASSPORT",
+                                birthPlace = "Bucharest",
+                                issuanceLocation = "RO",
+                                issuanceDate = "2020-01-01",
+                                number = "AB1234567",
+                                expiryDate = "2030-01-01",
+                                issuanceCountry = "RO",
+                                validityCountry = "RO",
+                                nationality = "RO",
+                                holder = true
+                            }
+                        }
+                    }
+                };
+
+                var contactInfo = new
+                {
+                    addresseeName = new
+                    {
+                        firstName = user.Name ?? "John",
+                        lastName = "Doe"
+                    },
+                    companyName = "TRAVELER",
+                    purpose = "STANDARD",
+                    phones = new[]
+                    {
+                        new
+                        {
+                            deviceType = "MOBILE",
+                            countryCallingCode = "40",
+                            number = user.PhoneNumber ?? "123456789"
+                        }
+                    },
+                    emailAddress = user.Email ?? "test@example.com",
+                    address = new
+                    {
+                        lines = new[] { "123 Main Street" },
+                        postalCode = "400000",
+                        cityName = "Cluj-Napoca",
+                        countryCode = "RO"
+                    }
+                };
+
+                var bookingUrl = "v1/booking/flight-orders";
+                var requestBody = new
+                {
+                    data = new
+                    {
+                        type = "flight-order",
+                        flightOffers = new[] { confirmedOffer.Value },
+                        travelers = amadeusTravelers,
+                        remarks = new
+                        {
+                            general = new[]
+                            {
+                                new { subType = "GENERAL_MISCELLANEOUS", text = "ONLINE BOOKING" }
+                            }
+                        },
+                        ticketingAgreement = new
+                        {
+                            option = "DELAY_TO_CANCEL",
+                            delay = "6D"
+                        },
+                        contacts = new[] { contactInfo }
+                    }
+                };
+
+                var jsonContent = new StringContent(
+                    JsonSerializer.Serialize(requestBody),
+                    System.Text.Encoding.UTF8,
+                    "application/json"
+                );
+
+                var request = new HttpRequestMessage(HttpMethod.Post, bookingUrl);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                request.Content = jsonContent;
+
+                var response = await _httpClient.SendAsync(request);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Booking Error: {responseContent}");
+                    return new FlightBookingResult
+                    {
+                        Success = false,
+                        Message = $"Booking failed: {responseContent}",
+                        Trip = trip,
+                        RawResponse = responseContent
+                    };
+                }
+
+                var json = JsonSerializer.Deserialize<JsonElement>(responseContent);
+
+                if (json.TryGetProperty("data", out var data))
+                {
+                    var result = new FlightBookingResult
+                    {
+                        Success = true,
+                        Message = "Booking successful!",
+                        Trip = trip,
+                        BookingDate = DateTime.UtcNow,
+                        RawResponse = responseContent
+                    };
+
+                    if (data.TryGetProperty("associatedRecords", out var records) && records.GetArrayLength() > 0)
+                    {
+                        result.BookingReference = records[0].GetProperty("reference").GetString();
+                    }
+
+                    if (data.TryGetProperty("id", out var orderId))
+                    {
+                        result.OrderId = orderId.GetString();
+                    }
+
+                    try
+                    {
+                        var repo = new TripRepository();
+                        // repo.SaveBooking(UserSession.CurrentUserId, result.BookingReference, result.OrderId, trip);
+                    }
+                    catch (Exception e)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Could not save booking: {e.Message}");
+                    }
+
+                    return result;
+                }
+
+                return new FlightBookingResult
+                {
+                    Success = false,
+                    Message = "Booking response was invalid",
+                    Trip = trip,
+                    RawResponse = responseContent
+                };
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Booking Exception: {ex.Message}");
+                return new FlightBookingResult
+                {
+                    Success = false,
+                    Message = $"Exception: {ex.Message}",
+                    Trip = trip
+                };
+            }
+        }
+
+        private decimal GetCommissionMultiplier(decimal totalPrice)
+        {
+            if (totalPrice <= 1000) return 1.05m;
+            if (totalPrice <= 1750) return 1.04m;
+            return 1.03m;
+        }
 
         public IEnumerable<string> GetEuropeanAirports() => AirportData.EuropeanAirportCodes.OrderBy(x => x).ToList();
         public IEnumerable<AirportData.AirportInfo> GetEuropeanAirportsWithCities() => AirportData.GetAllAirports();

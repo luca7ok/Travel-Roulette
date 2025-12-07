@@ -8,4 +8,5 @@ public class TripOption
     public decimal PricePerPerson { get; set; }
     public decimal TotalPrice { get; set; }
     public string HotelInfo { get; set; }
+    public string FlightOfferJson { get; set; }
 }

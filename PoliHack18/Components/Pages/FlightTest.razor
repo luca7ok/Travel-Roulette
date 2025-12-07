@@ -30,7 +30,7 @@
 
             <MudItem xs="12" sm="6">
                 <MudDatePicker @bind-Date="_departureDate"
-                               @bind-Date:after="HandleDepartureDateChange" 
+                               @bind-Date:after="HandleDepartureDateChange"
                                Label="Departure Date"
                                Variant="Variant.Outlined"
                                MinDate="@DateTime.Today"
@@ -54,7 +54,8 @@
                                  Min="0"
                                  Adornment="Adornment.Start"
                                  AdornmentIcon="@Icons.Material.Filled.Euro"
-                                 HelperText="@GetBudgetPerPersonText()"/>
+                                 HelperText="@GetBudgetPerPersonText()"
+                                 Immediate="true" OneKeyDown="HandleKeyDown"/>
             </MudItem>
 
             <MudItem xs="12">
