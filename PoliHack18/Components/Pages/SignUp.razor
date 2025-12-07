@@ -1,0 +1,224 @@
+﻿@page "/sign-up"
+@inject NavigationManager NavManager
+@inject ISnackbar SnackbarService
+@using PoliHack18.Models
+@using PoliHack18.Repository
+<PageTitle>Sign Up</PageTitle>
+
+<MudContainer Class="center-container">
+    <MudContainer MaxWidth="MaxWidth.ExtraSmall">
+        <MudCard Elevation="25" Class="pa-8">
+            <MudCardHeader>
+                <MudText Typo="Typo.h5" Class="mb-4">Create Your Account</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudForm @ref="@form" @bind-IsValid="@success">
+
+                    @* Name Input Field *@
+                    <MudTextField T="string" Label="Full Name"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Person"
+                                  @bind-Value="model.Name"
+                                  For="@(() => model.Name)"
+                                  Validation="@(new Func<string, string>(NameValidation))"
+                                  Required="true"
+                                  Immediate="true"
+                                  Class="mb-4" />
+
+                    @* Email Input Field *@
+                    <MudTextField T="string" Label="Email Address"
+                                  InputType="InputType.Email"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Email"
+                                  @bind-Value="model.Email"
+                                  For="@(() => model.Email)"
+                                  Validation="@(new Func<string, string>(EmailValidation))"
+                                  Required="true"
+                                  Immediate="true"
+                                  Class="mb-4" />
+
+                    @* Password Input Field *@
+                    <MudTextField T="string" Label="Password"
+                                  InputType="InputType.Password"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Lock"
+                                  @bind-Value="model.Password"
+                                  For="@(() => model.Password)"
+                                  Validation="@(new Func<string, string>(PasswordValidation))"
+                                  Required="true"
+                                  Immediate="true"
+                                  Class="mb-4" />
+
+                    @* Age Input Field *@
+                    <MudTextField T="int?" Label="Age"
+                                  InputType="InputType.Number"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Cake"
+                                  AdornmentText="years"
+                                  @bind-Value="model.Age"
+                                  For="@(() => model.Age)"
+                                  Validation="@(new Func<int?, string>(AgeValidation))"
+                                  
+                                  Required="true"
+                                  Immediate="true"
+                                  Class="mb-4" 
+                                  Min="0" />
+
+                    @* Phone Number Input Field *@
+                    <MudTextField T="string" Label="Phone Number"
+                                  InputType="InputType.Telephone"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Phone"
+                                  @bind-Value="model.PhoneNumber"
+                                  For="@(() => model.PhoneNumber)"
+                                  Validation="@(new Func<string, string>(PhoneValidation))"
+                                  Required="true"
+                                  Immediate="true"
+                                  Class="mb-6" />
+
+                    @* --- Action Buttons --- *@
+                    <div class="d-flex justify-space-between align-center">
+                        @* Make New Account Button *@
+                        <MudButton ButtonType="ButtonType.Button"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Size="Size.Large"
+                                   EndIcon="@Icons.Material.Filled.AppRegistration"
+                                   Disabled="@(!success || isLoading)"
+                                   OnClick="HandleSignUp">
+                            @if (isLoading)
+                            {
+                                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                <MudText Class="ms-2">Creating Account...</MudText>
+                            }
+                            else
+                            {
+                                <span>Make New Account</span>
+                            }
+                            
+                        </MudButton>
+
+                        @* Go Back Button *@
+                        <MudButton Variant="Variant.Text"
+                                   Color="Color.Default"
+                                   Size="Size.Large"
+                                   OnClick="GoBack">
+                            Go Back
+                        </MudButton>
+                    </div>
+
+                </MudForm>
+            </MudCardContent>
+        </MudCard>
+    </MudContainer>
+</MudContainer>
+
+@code {
+
+
+
+
+
+    private class SignUpModel
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public int? Age { get; set; }
+        public string PhoneNumber { get; set; } = string.Empty;
+    }
+
+    private SignUpModel model = new SignUpModel();
+    private MudForm form;
+    private bool success; 
+    private bool isLoading = false; 
+
+
+
+    private string NameValidation(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return "Name is required.";
+
+        return null;
+    }
+
+    private string EmailValidation(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return "Email is required.";
+        if (!System.Text.RegularExpressions.Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            return "Invalid email format.";
+        return null;
+    }
+
+    private string PasswordValidation(string password)
+    {
+        if (string.IsNullOrWhiteSpace(password))
+            return "Password is required.";
+        if (password.Length < 8)
+            return "Password must be at least 8 characters long.";
+        return null;
+    }
+
+    private string AgeValidation(int? age)
+    {
+        if (!age.HasValue)
+            return "Age is required.";
+        if (age < 0)
+            return "Age cannot be negative.";
+        if (age < 18)
+            return "You must be 18 or older to sign up.";      
+        return null;
+    }
+
+    private string PhoneValidation(string phone)
+    {
+        if (string.IsNullOrWhiteSpace(phone))
+            return "Phone number is required.";
+        if (!System.Text.RegularExpressions.Regex.IsMatch(phone.Replace(" ", "").Replace("-", ""), @"^\d{7,15}$"))
+            return "Invalid phone number format.";
+        return null;
+    }
+
+
+    private async Task HandleSignUp()
+    {
+        await form.Validate(); 
+
+        if (success)
+        {
+            isLoading = true;
+            StateHasChanged();
+            
+            
+            User new_user = new User()
+                {
+                    Email = model.Email,
+                    Password=model.Password,
+                    Age=model.Age.Value,
+                    Name=model.Name,
+                    PhoneNumber=model.PhoneNumber,
+
+                };
+            UserRepository repo=new UserRepository();
+            await repo.AddUser(new_user);
+            SnackbarService.Add("Account created successfully! Redirecting...", Severity.Success, config =>
+            {
+                config.ShowCloseIcon = false;
+                config.VisibleStateDuration = 3000; // Disappears after 3 seconds (3000ms)
+            });
+
+            await Task.Delay(500);
+            
+            StateHasChanged();
+            isLoading = false;
+            NavManager.NavigateTo("/");
+        }
+    }
+
+    private void GoBack()
+    {
+        NavManager.NavigateTo("/");
+    }
+}
