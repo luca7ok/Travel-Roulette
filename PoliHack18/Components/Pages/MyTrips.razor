@@ -1,57 +1,147 @@
 @page "/my-trips"
 @using PoliHack18.Models
-@using PoliHack18.Services
+@using PoliHack18.Services;
 @using PoliHack18.Repository
 @inject NavigationManager NavManager
 
-<div class="container mt-4">
-    <h3>My Trips</h3>
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
+    <MudText Typo="Typo.h3" Align="Align.Center" Class="mb-6"
+             Style="font-size: 2.5rem; color: #ffffff; marinn-top:-20px">My Trips
+    </MudText>
 
-    @if (!UserSession.IsLoggedIn)
+    @if (MySavedTrips == null)
     {
-        <div class="alert alert-warning">
-            You must be logged in to view your trips. <a href="/">Go to Login</a>
-        </div>
-    }
-    else if (MySavedTrips == null)
-    {
-        <p>Loading...</p>
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7"/>
+        <MudText Align="Align.Center" Style="color:white">Loading your trips...</MudText>
     }
     else if (MySavedTrips.Count == 0)
     {
-        <div class="text-center mt-5">
-            <p class="text-muted">You haven't saved any trips yet.</p>
-            <button class="btn btn-primary" @onclick="GoToSearch">Find a Trip Now</button>
-        </div>
+        <MudPaper Class="pa-8 text-center mt-8" Elevation="0">
+            <MudIcon Icon="@Icons.Material.Outlined.FlightTakeoff"
+                     Size="Size.Large"
+                     Color="Color.Default"
+                     Class="mb-4"
+                     Style="font-size: 64px; opacity: 0.3;"/>
+            <MudText Typo="Typo.h6" Class="mb-2" Style="color:white">No trips yet</MudText>
+            <MudText Color="Color.Default" Class="mb-4" Style="color:white">You haven't saved any trips yet.</MudText>
+            <MudButton Variant="Variant.Filled"
+                       Style="color:white" ,
+                       StartIcon="@Icons.Material.Filled.Search"
+                       OnClick="GoToSearch">
+                Find a Trip Now
+            </MudButton>
+        </MudPaper>
     }
     else
     {
-        <div class="row">
+        <MudGrid>
+            @{ int i = 0; }
             @foreach (var trip in MySavedTrips)
             {
-                <div class="col-md-6 mb-4">
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="m-0">@trip.Destination</h5>
-                        </div>
-                        <div class="card-body">
-                            <p><strong>🛫 Flight:</strong> @trip.FlightInfo</p>
-                            <p><strong>🏨 Hotel:</strong> @trip.HotelInfo</p>
-                            <hr />
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-muted">Total Price:</span>
-                                <h4 class="text-success m-0">€@trip.TotalPrice</h4>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                bool isUnlocked = (i != 0);
+                i++;
+
+                if (isUnlocked)
+                {
+                    <MudItem xs="12" sm="6" md="6">
+                        <MudCard Elevation="4" Class="h-100">
+                            <MudCardHeader Style="background-color: #743725; color: #ffffff">
+                                <CardHeaderContent>
+                                    <MudText Typo="Typo.h6" Style="color:#EFE2D2">@trip.Destination</MudText>
+                                </CardHeaderContent>
+                                <CardHeaderActions>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Flight"
+                                                   Color="Color.Inherit"/>
+                                </CardHeaderActions>
+                            </MudCardHeader>
+                            <MudCardContent Style="background-color: #EFE2D2; color: #27120F">
+                                <MudText Typo="Typo.body1" Class="mb-2">
+                                    <strong>Flight:</strong>@trip.FlightInfo
+                                </MudText>
+                                <MudText Typo="Typo.body1" Class="mb-4">
+                                    <strong>Hotel:</strong> @trip.HotelInfo
+                                </MudText>
+                                <MudDivider Class="my-4"/>
+                                <div class="d-flex justify-space-between align-center">
+                                    <MudText Color="Color.Default">Total Price:</MudText>
+                                    <MudText Typo="Typo.h5" Style="color: #27120F">€@trip.TotalPrice</MudText>
+                                </div>
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+                }
+                else
+                {
+                    <MudItem xs="12" sm="6" md="6">
+                        <MudCard Elevation="2" Class="h-100" Style="opacity: 0.8; border: 2px dashed #743725;">
+                            <MudCardHeader Style="background-color: #3e2b26; color: #ffffff">
+                                <CardHeaderContent>
+                                    <MudText Typo="Typo.h6" Style="color:#EFE2D2; font-style: italic;">
+                                        @trip.Destination (Locked)
+                                    </MudText>
+                                </CardHeaderContent>
+                                <CardHeaderActions>
+                                    <MudIcon Icon="@Icons.Material.Filled.Lock" Color="Color.Warning"/>
+                                </CardHeaderActions>
+                            </MudCardHeader>
+
+                            <MudCardContent
+                                Style="background-color: #dccdbb; color: #27120F; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 180px;">
+                                <MudIcon Icon="@Icons.Material.Filled.LockClock"
+                                         Style="font-size: 4rem; color: #743725; opacity: 0.6;" Class="mb-3"/>
+
+                                <MudText Typo="Typo.h6" Align="Align.Center">
+                                    Surprise Awaits!
+                                </MudText>
+
+                                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-2">
+                                    Trip details are hidden until<br/>
+                                    <strong>@GetUnlockDate(trip).ToString("MMM dd, HH:mm")</strong>
+                                </MudText>
+
+                                <MudTooltip Text="We keep the details secret until 24h before your flight!">
+                                    <MudChip T="string" Color="Color.Dark" Variant="Variant.Text" Size="Size.Small"
+                                             Icon="@Icons.Material.Filled.Info" Class="mt-4">
+                                        Why is this locked?
+                                    </MudChip>
+                                </MudTooltip>
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+                }
             }
-        </div>
+        </MudGrid>
     }
-</div>
+</MudContainer>
 
 @code {
     private List<TripOption>? MySavedTrips;
+
+    private bool IsTripUnlocked(TripOption trip)
+    {
+        string departureDate = trip.FlightInfo.Split(" to ")[0];
+        var hoursUntilDeparture = (DateTime.Parse(departureDate) - DateTime.Now).TotalHours;
+        return hoursUntilDeparture <= 24;
+    }
+
+
+    private DateTime GetDepartureDate(TripOption trip)
+    {
+        try
+        {
+            string departureDateString = trip.FlightInfo.Split(" to ")[0];
+            return DateTime.Parse(departureDateString);
+        }
+        catch (Exception ex)
+        {
+            return DateTime.MaxValue;
+        }
+    }
+
+    private DateTime GetUnlockDate(TripOption trip)
+    {
+        return GetDepartureDate(trip).AddHours(-24);
+    }
 
     protected override void OnInitialized()
     {
@@ -74,4 +164,5 @@
     {
         NavManager.NavigateTo("flight-test");
     }
+
 }

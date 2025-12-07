@@ -117,7 +117,7 @@ namespace PoliHack18.Services
                         {
                             Destination = AirportData.GetCityName(destCode),
                             DestinationCode = destCode,
-                            FlightInfo = $"Flight: {depDate} to {retDate} (${flightPricePerPerson}/person)",
+                            FlightInfo = $"{depDate} to {retDate} (${flightPricePerPerson}/person)",
                             PricePerPerson =
                                 flightPricePerPerson +
                                 (hotelOffer.Price / criteria.NumberOfPeople),
