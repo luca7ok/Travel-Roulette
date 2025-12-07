@@ -26,5 +26,25 @@ namespace PoliHack18.Repository
                 };
             await Task.Run(() => Database.ExecutaNonQuery(query, parameters));
         }
+
+        public async Task<bool> CheckEmailExistsAsync(string email)
+        {
+            string query =
+                "SELECT COUNT(*) FROM users WHERE email = @email;";
+
+            var parameters = new Dictionary<string, object?>
+            {
+                { "@email", email }
+            };
+
+            
+            long count = await Task.Run(() =>
+            {
+                
+                return Database.ExecutaScalar<long>(query, parameters);
+            });
+
+            return count > 0;
+        }
     }
 }

@@ -190,30 +190,62 @@
         {
             isLoading = true;
             StateHasChanged();
-            
-            
-            User new_user = new User()
+
+            try
+            {
+                UserRepository _userRepository = new UserRepository();
+             
+                bool exists = await _userRepository.CheckEmailExistsAsync(model.Email);
+
+                
+                if (exists == true)
+                {
+                    SnackbarService.Add("This email is already registered.", Severity.Warning, config =>
+                    {
+                        config.ShowCloseIcon = true;
+                        config.VisibleStateDuration = 5000; 
+                    });
+                    return;
+                }
+
+               
+                User new_user = new User()
                 {
                     Email = model.Email,
-                    Password=model.Password,
-                    Age=model.Age.Value,
-                    Name=model.Name,
-                    PhoneNumber=model.PhoneNumber,
 
+                    Password = model.Password,
+
+                    Age = model.Age.Value,
+
+                    Name = model.Name,
+
+                    PhoneNumber = model.PhoneNumber,
                 };
-            UserRepository repo=new UserRepository();
-            await repo.AddUser(new_user);
-            SnackbarService.Add("Account created successfully! Redirecting...", Severity.Success, config =>
-            {
-                config.ShowCloseIcon = false;
-                config.VisibleStateDuration = 3000; // Disappears after 3 seconds (3000ms)
-            });
 
-            await Task.Delay(500);
-            
-            StateHasChanged();
-            isLoading = false;
-            NavManager.NavigateTo("/");
+                await _userRepository.AddUser(new_user);
+
+                SnackbarService.Add("Account created successfully! Redirecting...", Severity.Success, config =>
+                {
+                    config.ShowCloseIcon = false;
+                    config.VisibleStateDuration = 3000;
+                });
+
+                await Task.Delay(500);
+                NavManager.NavigateTo("/");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Signup Error: {ex.Message}");
+                SnackbarService.Add("Registration failed due to a server error. Please try again.", Severity.Error, config =>
+                {
+                    config.VisibleStateDuration = 10000;
+                });
+            }
+            finally
+            {
+                isLoading = false;
+                StateHasChanged();
+            }
         }
     }
 
